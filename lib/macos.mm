@@ -6,8 +6,10 @@
 #include <map>
 #include <thread>
 #include <fstream>
+#import "BorderView.m"
 
 extern "C" AXError _AXUIElementGetWindow(AXUIElementRef, CGWindowID* out);
+extern "C" AXError drawRect();
 
 // CGWindowID to AXUIElementRef windows map
 std::map<int, AXUIElementRef> windowsMap;
@@ -197,6 +199,21 @@ Napi::String getWindowTitle(const Napi::CallbackInfo &info) {
   }
 
   return Napi::String::New(env, "");
+}
+
+Napi::Boolean addBorder(const Napi::CallbackInfo &info) {
+  Napi::Env env{info.Env()};
+
+  int handle = info[0].As<Napi::Number>().Int32Value();
+
+  auto wInfo = getWindowInfo(handle);
+
+  if (wInfo) {
+    drawRect();
+    return Napi::Boolean::New(env, true);
+  }
+
+  return Napi::Boolean::New(env, false);
 }
 
 Napi::Object getWindowBounds(const Napi::CallbackInfo &info) {
